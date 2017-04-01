@@ -83,6 +83,15 @@ namespace Mapper
                 drawImage();
             }
         }
+        private void clearImage()
+        {
+            if (image != null)
+            {
+                picBox.Width = (int)(imageWidth * ratio);
+                picBox.Height = (int)(imageHeight * ratio);
+                picBox.Image = (System.Drawing.Image)image.Clone();
+            }
+        }
         private void drawImage()
         {
             if (image != null)
@@ -90,30 +99,20 @@ namespace Mapper
                 picBox.Width = (int)(imageWidth * ratio);
                 picBox.Height = (int)(imageHeight * ratio);
                 picBox.Image = (System.Drawing.Image)image.Clone();
-                drawAreaRect();
+                drawAreas();
             }
         }
-        private void drawAreaRect()
+        private void drawAreas()
         {
             Graphics g = Graphics.FromImage(picBox.Image);
             foreach (AreaListItem area in areaList)
             {
-                if (!area.locked)
+                if (area.selected)
+                    g.FillRectangle(selectedAreaBrush, area.rect);
+                else
                     g.FillRectangle(areaBrush, area.rect);
             }
             g.Dispose();
-        }
-        private void drawSelectedAreaRect(int areaI)
-        {
-            if ((areaI >= 0) && (areaI < areaList.Count))
-            {
-                if (!areaList[areaI].locked)
-                {
-                    Graphics g = Graphics.FromImage(picBox.Image);
-                    g.FillRectangle(selectedAreaBrush, areaList[areaI].rect);
-                    g.Dispose();
-                }
-            }
         }
         private void openImage()
         {
@@ -210,14 +209,6 @@ namespace Mapper
                 areaList[i].i = i;
             }
         }
-        private void clearAreaTree()
-        {
-            foreach (TreeNode node in areaTree.Nodes)
-            {
-                node.BackColor = SystemColors.Window;
-                node.ForeColor = SystemColors.WindowText;
-            }
-        }
         private void fillAreaTree()
         {
             TreeNode node;
@@ -264,14 +255,6 @@ namespace Mapper
             for (int i = 0; i < hotspotList.Count; i++)
             {
                 hotspotList[i].i = i;
-            }
-        }
-        private void clearHotspotTree()
-        {
-            foreach (TreeNode node in hotspotTree.Nodes)
-            {
-                node.BackColor = SystemColors.Window;
-                node.ForeColor = SystemColors.WindowText;
             }
         }
         private void fillHotspotTree()
@@ -341,76 +324,125 @@ namespace Mapper
                 }
             }
         }
-        //выделение узлов дерева областей, связанных с данным узлом дерева горячих точек  
-        private void selectAreaTreeNodes(TreeNode hotspotTreeNode)
+        //формирование списка областей по списку горячих точек
+        private List<int> fillSelectedAreaTreeNodesList(List<int> selectedHotspotTreeNodesList)
         {
-            if (hotspotTreeNode != null)
+            List<int> list = new List<int>();
+            foreach(int i in selectedHotspotTreeNodesList)
             {
-                if (hotspotTreeNode.Level == 1)
-                    hotspotTreeNode = hotspotTreeNode.Parent;
-                selectAreaTreeNodes((int)hotspotTreeNode.Tag);
+                list.AddRange(hotspotList[i].areaI);
+            }
+            return list;
+        }
+        //формирование списка горячих точек по списку областей
+        private List<int> fillSelectedHotspotTreeNodesList(List<int> selectedAreaTreeNodesList)
+        {
+            List<int> list = new List<int>();
+            foreach (int i in selectedAreaTreeNodesList)
+            {
+                if (areaList[i].hotspotI >= 0)
+                    list.Add(areaList[i].hotspotI);
+            }
+            return list;
+        }
+        //очистка дерева
+        private void clearTree(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.BackColor = SystemColors.Window;
+                node.ForeColor = SystemColors.WindowText;
             }
         }
-        //выделение узлов дерева областей, связанных с узлом дерева горячих точек, указанному по индексу 
-        private void selectAreaTreeNodes(int hotspotI)
+        //выделение узлов дерева горячих точек
+        private void selectHotspotTreeNodes()
         {
-            if (hotspotI >= 0 && hotspotI < hotspotList.Count)
+            clearTree(hotspotTree.Nodes);
+            foreach (int i in selectedHotspotList)
             {
-                foreach (int i in hotspotList[hotspotI].areaI)
-                {
-                    areaTree.Nodes[i].BackColor = SystemColors.Highlight;
-                    areaTree.Nodes[i].ForeColor = SystemColors.HighlightText;
-                    areaTree.Nodes[i].EnsureVisible();
-                    drawSelectedAreaRect(i);
-                }
+                hotspotTree.Nodes[i].BackColor = SystemColors.Highlight;
+                hotspotTree.Nodes[i].ForeColor = SystemColors.HighlightText;
+                hotspotTree.Nodes[i].EnsureVisible();
             }
         }
-        //выделение узла дерева горячих точек, связанных с данным узлом дерева областей  
-        private void selectHotspotTreeNode(TreeNode areaTreeNode)
+        //выделение узлов дерева областей
+        private void selectAreaTreeNodes()
         {
-            if (areaTreeNode != null)
+            clearTree(areaTree.Nodes);
+            foreach (int i in selectedAreaList)
             {
-                if (areaTreeNode.Level == 1)
-                    areaTreeNode = areaTreeNode.Parent;
-                selectHotspotTreeNode((int)areaTreeNode.Tag);
+                areaTree.Nodes[i].BackColor = SystemColors.Highlight;
+                areaTree.Nodes[i].ForeColor = SystemColors.HighlightText;
+                areaTree.Nodes[i].EnsureVisible();
             }
         }
-        //выделение узла дерева горячих точек, связанных с узлом дерева областей, указанному по индексу 
-        private void selectHotspotTreeNode(int areaI)
-        {
-            if (areaI >= 0 && areaI < areaList.Count)
-            {
-                int hotspotI = areaList[areaI].hotspotI;
-                if (hotspotI >= 0 && hotspotI < hotspotList.Count)
-                {
-                    hotspotTree.Nodes[hotspotI].BackColor = SystemColors.Highlight;
-                    hotspotTree.Nodes[hotspotI].ForeColor = SystemColors.HighlightText;
-                    hotspotTree.Nodes[hotspotI].EnsureVisible();
-                }
-            }
-        }
-        //выделение области на рисуке по координатам точки
-        private void selectArea(Point p)
+        //выделение областей на рисунке
+        private void selectAreas()
         {
             foreach (AreaListItem area in areaList)
             {
-                if (!area.locked && area.rect.Contains(p))
-                {
-                    int hotspotI = areaList[area.i].hotspotI;
-                    if (hotspotI >= 0 && hotspotI < hotspotList.Count)
-                    {
-                        hotspotTree.Nodes[hotspotI].BackColor = SystemColors.Highlight;
-                        hotspotTree.Nodes[hotspotI].ForeColor = SystemColors.HighlightText;
-                        hotspotTree.Nodes[hotspotI].EnsureVisible();
-                    }
-                    areaTree.Nodes[area.i].BackColor = SystemColors.Highlight;
-                    areaTree.Nodes[area.i].ForeColor = SystemColors.HighlightText;
-                    areaTree.Nodes[area.i].EnsureVisible();
-                    drawSelectedAreaRect(area.i);
-                }
+                area.selected = false;    
+            }
+            foreach (int i in selectedAreaList)
+            {
+                areaList[i].selected = true;
             }
         }
 
+
+
+
+        //поиск области по точке
+        private AreaListItem findArea(Point p)
+        {
+            foreach (AreaListItem area in areaList)
+            {
+                if (area.rect.Contains(p))
+                    return area;
+            }
+            return null;
+        }
+        private void changeSelectedAreasCoords(Point p)
+        {
+            int deltaX = p.X - initialMousePoint.X;
+            int deltaY = p.Y - initialMousePoint.Y;
+            foreach (AreaListItem area in areaList)
+            {
+                if (area.selected)
+                {
+                    coordsChanged = true;
+                    area.x += deltaX;
+                    area.y += deltaY;
+                    area.rect.X += deltaX;
+                    area.rect.Y += deltaY;
+                    area.coords = String.Format("{0},{1},{2},{3}", area.x, area.y, area.w, area.h);
+                }
+            }
+        }
+        private void changeSelectedAreasCoords(int deltaX, int deltaY)
+        {
+            foreach (AreaListItem area in areaList)
+            {
+                if (area.selected)
+                {
+                    coordsChanged = true;
+                    area.x += deltaX;
+                    area.y += deltaY;
+                    area.rect.X += deltaX;
+                    area.rect.Y += deltaY;
+                    area.coords = String.Format("{0},{1},{2},{3}", area.x, area.y, area.w, area.h);
+                }
+            }
+        }
+        private void changeNewAreaCoords(Point p)
+        {
+            coordsChanged = true;
+            newArea.w = p.X - newArea.x;
+            newArea.h = p.Y - newArea.y;
+            newArea.rect.Width = newArea.w;
+            newArea.rect.Height = newArea.h;
+            newArea.coords = String.Format("{0},{1},{2},{3}", newArea.x, newArea.y, newArea.w, newArea.h);
+        }
 
 
     }

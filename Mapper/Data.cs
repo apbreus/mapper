@@ -19,7 +19,7 @@ namespace Mapper
         public string coords;
         public bool linked;             //область связана с горячей точкой
         public int hotspotI;            //индекс горячей точки, с которой связана область
-        public bool locked;             //область заблокирована для отрисовки
+        public bool selected;           //область выбрана (активна)
         public int x, y, w, h;
         public Rectangle rect;
         public AreaListItem()
@@ -57,4 +57,9 @@ namespace Mapper
         linked = 2
     }
 
+    public enum MouseMode
+    {
+        select = 0,
+        rect = 1
+    }
 }

@@ -51,6 +51,9 @@ namespace Mapper
             this.areaTree = new System.Windows.Forms.TreeView();
             this.areaCountLabel = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.mouseModeToolStrip = new System.Windows.Forms.ToolStrip();
+            this.selectMouseModeToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.moveMouseModeToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.imageSize = new System.Windows.Forms.Label();
             this.picPanel = new System.Windows.Forms.Panel();
             this.picBox = new System.Windows.Forms.PictureBox();
@@ -70,6 +73,7 @@ namespace Mapper
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.mouseModeToolStrip.SuspendLayout();
             this.picPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBox)).BeginInit();
             this.areaTreeContextMenuStrip.SuspendLayout();
@@ -190,6 +194,7 @@ namespace Mapper
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.mouseModeToolStrip);
             this.splitContainer.Panel2.Controls.Add(this.imageSize);
             this.splitContainer.Panel2.Controls.Add(this.picPanel);
             this.splitContainer.Panel2.Controls.Add(this.viewToolStrip);
@@ -233,7 +238,8 @@ namespace Mapper
             this.hotspotTree.Name = "hotspotTree";
             this.hotspotTree.SelectedImageIndex = 0;
             this.hotspotTree.Size = new System.Drawing.Size(124, 274);
-            this.hotspotTree.TabIndex = 10;
+            this.hotspotTree.TabIndex = 0;
+            this.hotspotTree.TabStop = false;
             this.hotspotTree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.hotspotTree_AfterLabelEdit);
             this.hotspotTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.hotspotTree_AfterSelect);
             this.hotspotTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.hotspotTree_MouseUp);
@@ -277,7 +283,8 @@ namespace Mapper
             this.areaTree.Name = "areaTree";
             this.areaTree.SelectedImageIndex = 0;
             this.areaTree.Size = new System.Drawing.Size(132, 274);
-            this.areaTree.TabIndex = 11;
+            this.areaTree.TabIndex = 1;
+            this.areaTree.TabStop = false;
             this.areaTree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.areaTree_AfterLabelEdit);
             this.areaTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.areaTree_AfterSelect);
             this.areaTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.areaTree_MouseUp);
@@ -299,6 +306,42 @@ namespace Mapper
             this.label2.Size = new System.Drawing.Size(34, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "Areas";
+            // 
+            // mouseModeToolStrip
+            // 
+            this.mouseModeToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.mouseModeToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectMouseModeToolStripButton,
+            this.moveMouseModeToolStripButton});
+            this.mouseModeToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            this.mouseModeToolStrip.Location = new System.Drawing.Point(145, 0);
+            this.mouseModeToolStrip.Name = "mouseModeToolStrip";
+            this.mouseModeToolStrip.Size = new System.Drawing.Size(58, 25);
+            this.mouseModeToolStrip.TabIndex = 11;
+            this.mouseModeToolStrip.Text = "toolStrip1";
+            this.mouseModeToolStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.mouseModeToolStrip_ItemClicked);
+            // 
+            // selectMouseModeToolStripButton
+            // 
+            this.selectMouseModeToolStripButton.Checked = true;
+            this.selectMouseModeToolStripButton.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.selectMouseModeToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.selectMouseModeToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("selectMouseModeToolStripButton.Image")));
+            this.selectMouseModeToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.selectMouseModeToolStripButton.Name = "selectMouseModeToolStripButton";
+            this.selectMouseModeToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.selectMouseModeToolStripButton.Tag = "0";
+            this.selectMouseModeToolStripButton.ToolTipText = "Выбор и перемещение областей";
+            // 
+            // moveMouseModeToolStripButton
+            // 
+            this.moveMouseModeToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.moveMouseModeToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("moveMouseModeToolStripButton.Image")));
+            this.moveMouseModeToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.moveMouseModeToolStripButton.Name = "moveMouseModeToolStripButton";
+            this.moveMouseModeToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.moveMouseModeToolStripButton.Tag = "1";
+            this.moveMouseModeToolStripButton.ToolTipText = "Создание областей";
             // 
             // imageSize
             // 
@@ -330,6 +373,9 @@ namespace Mapper
             this.picBox.TabIndex = 9;
             this.picBox.TabStop = false;
             this.picBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picBox_MouseClick);
+            this.picBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picBox_MouseDown);
+            this.picBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.picBox_MouseMove);
+            this.picBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.picBox_MouseUp);
             // 
             // areaTreeContextMenuStrip
             // 
@@ -382,6 +428,7 @@ namespace Mapper
             this.ClientSize = new System.Drawing.Size(769, 356);
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.fileToolStrip);
+            this.KeyPreview = true;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Mapper";
@@ -400,6 +447,8 @@ namespace Mapper
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.mouseModeToolStrip.ResumeLayout(false);
+            this.mouseModeToolStrip.PerformLayout();
             this.picPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picBox)).EndInit();
             this.areaTreeContextMenuStrip.ResumeLayout(false);
@@ -440,6 +489,9 @@ namespace Mapper
         private ContextMenuStrip hotspotTreeContextMenuStrip;
         private ToolStripMenuItem addHotspotTreeToolStripMenuItem;
         private ToolStripMenuItem delHotspotTreeToolStripMenuItem;
+        private ToolStrip mouseModeToolStrip;
+        private ToolStripButton selectMouseModeToolStripButton;
+        private ToolStripButton moveMouseModeToolStripButton;
 
 	}
 }
