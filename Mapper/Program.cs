@@ -19,7 +19,6 @@ namespace Mapper
 			try
 			{
 				Application.EnableVisualStyles();
-				//Application.EnableRTLMirroring();
 				Application.Run(new Mapper.MainForm());
 			}
 			catch (System.Exception ex)
